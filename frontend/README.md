@@ -1,6 +1,6 @@
 # Stori Financial Tracker - Frontend
 
-React-based web application for visualizing financial data with AI-powered insights.
+React + TypeScript web application for visualizing financial data with AI-powered insights.
 
 ## 🚀 Quick Start
 
@@ -21,6 +21,7 @@ npm run preview
 ## 📋 Tech Stack
 
 - **React 18** - UI framework
+- **TypeScript** - Type-safe JavaScript
 - **Vite** - Build tool & dev server
 - **TailwindCSS** - Utility-first styling
 - **Recharts** - Chart library for visualizations
@@ -37,12 +38,13 @@ frontend/
 │   │   ├── AI/            # AI advisor components
 │   │   └── common/        # Reusable UI components
 │   ├── services/
-│   │   └── api.js         # API client & service methods
+│   │   └── api.ts         # API client & service methods with types
 │   ├── hooks/             # Custom React hooks
 │   ├── utils/
-│   │   └── formatters.js  # Currency, date, number formatting
-│   ├── App.jsx            # Main app component
-│   └── main.jsx           # Entry point
+│   │   └── formatters.ts  # Currency, date, number formatting
+│   ├── App.tsx            # Main app component
+│   ├── main.tsx           # Entry point
+│   └── vite-env.d.ts      # Vite environment types
 ├── public/                # Static assets
 └── index.html            # HTML template
 ```

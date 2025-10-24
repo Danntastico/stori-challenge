@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { checkHealth } from './services/api';
 
 function App() {
-  const [apiStatus, setApiStatus] = useState('checking...');
+  const [apiStatus, setApiStatus] = useState<string>('checking...');
 
   useEffect(() => {
     // Check API health on mount
@@ -72,7 +72,7 @@ function App() {
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-8">
         <div className="text-center text-sm text-gray-500">
-          Built with React + Vite + TailwindCSS + Recharts
+          Built with React + TypeScript + Vite + TailwindCSS + Recharts
         </div>
       </footer>
     </div>
@@ -80,3 +80,4 @@ function App() {
 }
 
 export default App;
+
