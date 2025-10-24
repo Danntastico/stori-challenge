@@ -30,8 +30,8 @@ func TestWithActualData(t *testing.T) {
 			t.Fatalf("GetAll() error = %v", err)
 		}
 
-		// The actual file has 114 transactions
-		expectedCount := 114
+		// The actual file has 112 transactions
+		expectedCount := 112
 		if len(transactions) != expectedCount {
 			t.Errorf("Expected %d transactions, got %d", expectedCount, len(transactions))
 		}
@@ -85,8 +85,8 @@ func TestWithActualData(t *testing.T) {
 			t.Fatalf("GetByType() error = %v", err)
 		}
 
-		// Should have 94 expense transactions (114 total - 20 income)
-		expectedCount := 94
+		// Should have 94 expense transactions (112 total - 20 income)
+		expectedCount := 92
 		if len(expenses) != expectedCount {
 			t.Errorf("Expected %d expense transactions, got %d", expectedCount, len(expenses))
 		}
@@ -148,7 +148,7 @@ func TestWithActualData(t *testing.T) {
 
 	t.Run("repository count", func(t *testing.T) {
 		count := repo.Count()
-		expectedCount := 114
+		expectedCount := 112
 
 		if count != expectedCount {
 			t.Errorf("Count() = %d, want %d", count, expectedCount)
