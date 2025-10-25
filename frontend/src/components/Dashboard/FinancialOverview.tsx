@@ -1,6 +1,7 @@
 import { getCategorySummary, CategorySummaryResponse } from '../../services/api';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import { useApiData } from '../../hooks/useFetch';
+import { LoadingSkeleton, ErrorAlert, Card } from '../common';
 
 interface StatCardProps {
   title: string;
@@ -20,7 +21,7 @@ function StatCard({ title, value, subtitle, trend, icon }: StatCardProps) {
   const bgColor = trend ? trendColors[trend] : 'bg-gray-50';
 
   return (
-    <div className="card hover:shadow-lg transition-shadow duration-200">
+    <Card hover>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
@@ -37,7 +38,7 @@ function StatCard({ title, value, subtitle, trend, icon }: StatCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -47,25 +48,11 @@ export default function FinancialOverview() {
   );
 
   if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="card animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          </div>
-        ))}
-      </div>
-    );
+    return <LoadingSkeleton variant="stat-cards" />;
   }
 
   if (error || !summary) {
-    return (
-      <div className="card bg-red-50 border border-red-200">
-        <p className="text-red-800 font-medium">⚠️ {error || 'No data available'}</p>
-      </div>
-    );
+    return <ErrorAlert message={error || 'No data available'} />;
   }
 
   const { summary: financialSummary, period } = summary;

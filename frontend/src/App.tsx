@@ -3,6 +3,7 @@ import { checkHealth } from './services/api';
 import FinancialOverview from './components/Dashboard/FinancialOverview';
 import CategoryChart from './components/Charts/CategoryChart';
 import TimelineChart from './components/Charts/TimelineChart';
+import { Card } from './components/common';
 
 function App() {
   const [apiStatus, setApiStatus] = useState<string>('checking...');
@@ -64,7 +65,7 @@ function App() {
         {/* AI Advisor Placeholder */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">🤖 AI Financial Advisor</h2>
-          <div className="card bg-linear-to-br from-purple-50 to-blue-50 border-2 border-dashed border-purple-300">
+          <Card gradient>
             <div className="text-center py-8">
               <p className="text-lg font-medium text-purple-900 mb-2">
                 🚀 Coming Soon!
@@ -73,7 +74,7 @@ function App() {
                 Get personalized financial advice powered by AI
               </p>
             </div>
-          </div>
+          </Card>
         </section>
       </main>
 

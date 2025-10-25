@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, PieLabelRend
 import { getCategorySummary, CategorySummaryResponse, CategoryDetail } from '../../services/api';
 import { formatCurrency, formatPercentage } from '../../utils/formatters';
 import { useApiData } from '../../hooks/useFetch';
+import { ToggleButtonGroup, LoadingSkeleton, ErrorAlert } from '../common';
 
 interface ChartDataItem {
   name: string;
@@ -57,22 +58,11 @@ export default function CategoryChart() {
   const [selectedType, setSelectedType] = useState<'expenses' | 'income'>('expenses');
 
   if (loading) {
-    return (
-      <div className="card">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
+    return <LoadingSkeleton variant="chart" />;
   }
 
   if (error || !summary) {
-    return (
-      <div className="card bg-red-50 border border-red-200">
-        <p className="text-red-800 font-medium">⚠️ {error || 'No data available'}</p>
-      </div>
-    );
+    return <ErrorAlert message={error || 'No data available'} />;
   }
 
   // Prepare chart data
@@ -98,28 +88,14 @@ export default function CategoryChart() {
         </h2>
         
         {/* Toggle Buttons */}
-        <div className="inline-flex rounded-lg border border-gray-300 bg-white">
-          <button
-            onClick={() => setSelectedType('expenses')}
-            className={`px-4 py-2 text-sm font-medium rounded-l-lg transition-colors ${
-              selectedType === 'expenses'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Expenses
-          </button>
-          <button
-            onClick={() => setSelectedType('income')}
-            className={`px-4 py-2 text-sm font-medium rounded-r-lg transition-colors ${
-              selectedType === 'income'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Income
-          </button>
-        </div>
+        <ToggleButtonGroup
+          options={[
+            { value: 'expenses' as const, label: 'Expenses' },
+            { value: 'income' as const, label: 'Income' },
+          ]}
+          value={selectedType}
+          onChange={setSelectedType}
+        />
       </div>
 
       {/* Chart */}
