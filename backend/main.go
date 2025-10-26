@@ -40,10 +40,19 @@ func main() {
 	analyticsService := service.NewAnalyticsService(repo)
 	log.Println("✅ Analytics service initialized")
 
+	// Initialize AI service
+	aiService := service.NewAIService(config.OpenAIAPIKey)
+	if config.OpenAIAPIKey == "" {
+		log.Println("⚠️  OpenAI API key not provided - using mock responses")
+	} else {
+		log.Println("✅ AI service initialized with OpenAI integration")
+	}
+
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler()
 	transactionHandler := handlers.NewTransactionHandler(analyticsService)
 	summaryHandler := handlers.NewSummaryHandler(analyticsService)
+	adviceHandler := handlers.NewAdviceHandler(analyticsService, aiService)
 	log.Println("✅ Handlers initialized")
 
 	// Initialize chi router
@@ -64,6 +73,7 @@ func main() {
 	r.Get("/api/transactions", transactionHandler.ServeHTTP)
 	r.Get("/api/summary/categories", summaryHandler.HandleCategorySummary)
 	r.Get("/api/summary/timeline", summaryHandler.HandleTimeline)
+	r.Post("/api/advice", adviceHandler.GetAdvice)
 
 	// Root endpoint for API info
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +87,8 @@ func main() {
 				"health": "/api/health",
 				"transactions": "/api/transactions",
 				"categories": "/api/summary/categories",
-				"timeline": "/api/summary/timeline"
+				"timeline": "/api/summary/timeline",
+				"advice": "/api/advice"
 			}
 		}`))
 	})
@@ -101,6 +112,7 @@ func main() {
 		log.Println("   GET  /api/transactions")
 		log.Println("   GET  /api/summary/categories")
 		log.Println("   GET  /api/summary/timeline")
+		log.Println("   POST /api/advice")
 		log.Println("💡 Press Ctrl+C to shutdown")
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -132,6 +144,7 @@ type Config struct {
 	Port           string
 	AllowedOrigins []string
 	LogLevel       string
+	OpenAIAPIKey   string
 }
 
 // loadConfig loads configuration from environment variables with defaults
@@ -139,6 +152,7 @@ func loadConfig() Config {
 	port := getEnv("PORT", "8080")
 	originsStr := getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
 	logLevel := getEnv("LOG_LEVEL", "info")
+	openAIAPIKey := getEnv("OPENAI_API_KEY", "")
 
 	// Parse allowed origins
 	var allowedOrigins []string
@@ -156,6 +170,7 @@ func loadConfig() Config {
 		Port:           port,
 		AllowedOrigins: allowedOrigins,
 		LogLevel:       logLevel,
+		OpenAIAPIKey:   openAIAPIKey,
 	}
 
 	log.Println("⚙️  Configuration loaded:")
