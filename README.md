@@ -213,9 +213,10 @@ scp -r dist/* ec2-user@server:/var/www/stori/
 ### Features Users Would Want
 1. **CRUD Operations** - Add, edit, delete transactions
 2. **Multi-Account Support** - Track cash, checking, savings separately
-3. **Export Data** - CSV/PDF reports
-4. **Custom Categories** - User-defined spending categories
-5. **Goal Tracking** - Savings goals with progress visualization
+3. **Budget Tracking** - Set monthly budgets per category with alerts
+4. **Export Data** - CSV/PDF reports
+5. **Custom Categories** - User-defined spending categories
+6. **Goal Tracking** - Savings goals with progress visualization
 
 ### Technical Improvements
 1. **Database Migration** - PostgreSQL/DynamoDB for persistence
