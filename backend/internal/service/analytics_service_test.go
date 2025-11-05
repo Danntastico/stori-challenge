@@ -426,3 +426,114 @@ func TestAnalyticsService_EmptyData(t *testing.T) {
 	})
 }
 
+// MockRepository is a test double that implements TransactionRepository
+// This demonstrates how the interface abstraction enables easy testing
+// without needing real data sources (JSON files, databases, etc.)
+type MockRepository struct {
+	transactions []domain.Transaction
+	getAllErr    error
+	getByRangeErr error
+}
+
+// Ensure MockRepository implements TransactionRepository interface
+var _ repository.TransactionRepository = (*MockRepository)(nil)
+
+func NewMockRepository(transactions []domain.Transaction) *MockRepository {
+	return &MockRepository{
+		transactions: transactions,
+	}
+}
+
+func (m *MockRepository) GetAll() ([]domain.Transaction, error) {
+	if m.getAllErr != nil {
+		return nil, m.getAllErr
+	}
+	return m.transactions, nil
+}
+
+func (m *MockRepository) GetByDateRange(start, end time.Time) ([]domain.Transaction, error) {
+	if m.getByRangeErr != nil {
+		return nil, m.getByRangeErr
+	}
+	
+	var filtered []domain.Transaction
+	for _, tx := range m.transactions {
+		txDate, err := time.Parse("2006-01-02", tx.Date)
+		if err != nil {
+			continue
+		}
+		if (txDate.Equal(start) || txDate.After(start)) && (txDate.Equal(end) || txDate.Before(end)) {
+			filtered = append(filtered, tx)
+		}
+	}
+	
+	if len(filtered) == 0 {
+		return nil, domain.ErrNoTransactions
+	}
+	return filtered, nil
+}
+
+func (m *MockRepository) GetByType(txType string) ([]domain.Transaction, error) {
+	var filtered []domain.Transaction
+	for _, tx := range m.transactions {
+		if tx.Type == txType {
+			filtered = append(filtered, tx)
+		}
+	}
+	if len(filtered) == 0 {
+		return nil, domain.ErrNoTransactions
+	}
+	return filtered, nil
+}
+
+func (m *MockRepository) GetByCategory(category string) ([]domain.Transaction, error) {
+	var filtered []domain.Transaction
+	for _, tx := range m.transactions {
+		if tx.Category == category {
+			filtered = append(filtered, tx)
+		}
+	}
+	if len(filtered) == 0 {
+		return nil, domain.ErrNoTransactions
+	}
+	return filtered, nil
+}
+
+// Example test using the mock repository
+func TestAnalyticsService_WithMockRepository(t *testing.T) {
+	// Create mock data directly (no JSON parsing needed!)
+	mockTransactions := []domain.Transaction{
+		{Date: "2024-01-01", Amount: 1000, Category: "salary", Description: "Test salary", Type: "income"},
+		{Date: "2024-01-02", Amount: -500, Category: "rent", Description: "Test rent", Type: "expense"},
+		{Date: "2024-01-03", Amount: -100, Category: "groceries", Description: "Test groceries", Type: "expense"},
+	}
+
+	// Create mock repository
+	mockRepo := NewMockRepository(mockTransactions)
+
+	// Use mock in service (works because mock implements the interface!)
+	service := NewAnalyticsService(mockRepo)
+
+	// Test the service with mock data
+	summary, err := service.GetCategorySummary()
+	if err != nil {
+		t.Fatalf("GetCategorySummary() error = %v", err)
+	}
+
+	// Verify results
+	if summary.Summary.TotalIncome != 1000 {
+		t.Errorf("Expected total income 1000, got %v", summary.Summary.TotalIncome)
+	}
+
+	if summary.Summary.TotalExpenses != 600 {
+		t.Errorf("Expected total expenses 600, got %v", summary.Summary.TotalExpenses)
+	}
+
+	// Benefits of this approach:
+	// 1. No JSON parsing overhead
+	// 2. No file I/O operations
+	// 3. Fast test execution
+	// 4. Easy to test edge cases (empty data, errors, etc.)
+	// 5. Can simulate errors by setting mockRepo.getAllErr
+}
+
