@@ -187,7 +187,30 @@ func (s *AIService) callOpenAI(ctx context.Context, prompt string) (string, erro
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("OpenAI API error (status %d): %s", resp.StatusCode, string(body))
+		// Map OpenAI API status codes to appropriate HTTP errors
+		var statusCode int
+		var message string
+
+		switch resp.StatusCode {
+		case http.StatusTooManyRequests: // 429
+			// Rate limit - pass through to client (they can retry)
+			statusCode = http.StatusTooManyRequests
+			message = "OpenAI API rate limit exceeded. Please try again later."
+		case http.StatusUnauthorized: // 401
+			// Invalid API key - this is our configuration issue, but expose as 500
+			statusCode = http.StatusInternalServerError
+			message = "AI service configuration error"
+		case http.StatusServiceUnavailable: // 503
+			// OpenAI is down - map to 503 for client
+			statusCode = http.StatusServiceUnavailable
+			message = "AI service is temporarily unavailable. Please try again later."
+		default:
+			// Other errors - map to 502 (Bad Gateway) since it's an external service issue
+			statusCode = http.StatusBadGateway
+			message = fmt.Sprintf("AI service error (status %d)", resp.StatusCode)
+		}
+
+		return "", domain.NewHTTPErrorWithCause(statusCode, message, fmt.Errorf("OpenAI API error (status %d): %s", resp.StatusCode, string(body)))
 	}
 
 	var openAIResp openAIResponse

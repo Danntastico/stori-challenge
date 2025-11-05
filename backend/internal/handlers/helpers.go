@@ -41,6 +41,13 @@ func respondWithError(w http.ResponseWriter, statusCode int, message string) {
 
 // handleServiceError maps domain errors to HTTP status codes and sends appropriate responses
 func handleServiceError(w http.ResponseWriter, err error) {
+	// Check if error is an HTTPError (preserves status code from external APIs)
+	var httpErr *domain.HTTPError
+	if errors.As(err, &httpErr) {
+		respondWithError(w, httpErr.StatusCode, httpErr.Message)
+		return
+	}
+
 	// Map domain errors to HTTP status codes
 	switch {
 	case errors.Is(err, domain.ErrNoTransactions):
