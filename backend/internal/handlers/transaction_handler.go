@@ -10,11 +10,12 @@ import (
 
 // TransactionHandler handles transaction-related requests
 type TransactionHandler struct {
-	analyticsService *service.AnalyticsService
+	analyticsService service.AnalyticsServiceInterface
 }
 
 // NewTransactionHandler creates a new transaction handler
-func NewTransactionHandler(analyticsService *service.AnalyticsService) *TransactionHandler {
+// Now accepts interface instead of concrete type for better testability
+func NewTransactionHandler(analyticsService service.AnalyticsServiceInterface) *TransactionHandler {
 	return &TransactionHandler{
 		analyticsService: analyticsService,
 	}

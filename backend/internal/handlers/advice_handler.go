@@ -10,12 +10,13 @@ import (
 
 // AdviceHandler handles AI financial advice requests
 type AdviceHandler struct {
-	analyticsService *service.AnalyticsService
-	aiService        *service.AIService
+	analyticsService service.AnalyticsServiceInterface
+	aiService        service.AIServiceInterface
 }
 
 // NewAdviceHandler creates a new advice handler
-func NewAdviceHandler(analyticsService *service.AnalyticsService, aiService *service.AIService) *AdviceHandler {
+// Now accepts interfaces instead of concrete types for better testability
+func NewAdviceHandler(analyticsService service.AnalyticsServiceInterface, aiService service.AIServiceInterface) *AdviceHandler {
 	return &AdviceHandler{
 		analyticsService: analyticsService,
 		aiService:        aiService,

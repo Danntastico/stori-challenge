@@ -8,11 +8,12 @@ import (
 
 // SummaryHandler handles financial summary requests
 type SummaryHandler struct {
-	analyticsService *service.AnalyticsService
+	analyticsService service.AnalyticsServiceInterface
 }
 
 // NewSummaryHandler creates a new summary handler
-func NewSummaryHandler(analyticsService *service.AnalyticsService) *SummaryHandler {
+// Now accepts interface instead of concrete type for better testability
+func NewSummaryHandler(analyticsService service.AnalyticsServiceInterface) *SummaryHandler {
 	return &SummaryHandler{
 		analyticsService: analyticsService,
 	}

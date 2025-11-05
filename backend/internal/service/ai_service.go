@@ -24,9 +24,9 @@ func NewAIService(apiKey string) *AIService {
 	return &AIService{
 		apiKey: apiKey,
 		apiURL: "https://api.openai.com/v1/chat/completions",
-		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
+		// No HTTP client timeout - rely on context cancellation from handler timeout (60s)
+		// The context passed via NewRequestWithContext will control when the request is cancelled
+		httpClient: &http.Client{},
 	}
 }
 
